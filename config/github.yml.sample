@@ -1,0 +1,8 @@
+github.com:
+  api_endpoint: "https://api.github.com/"
+  web_endpoint: "https://github.com/"
+  access_token: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+my.ghe.domain:
+  api_endpoint: "https://my.ghe.domain/api/v3/"
+  web_endpoint: "https://my.ghe.domain/"
+  access_token: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

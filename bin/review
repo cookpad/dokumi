@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname($0), "..", "lib"))
+require "dokumi"
+
+def invalid_syntax
+  error_message = <<-END
+syntax:
+$ #{$0} host owner repo pull-request-number
+$ #{$0} pull-request-url
+  END
+  raise error_message
+end
+
+environment_options = Dokumi::Command.extract_environment_options
+
+if ARGV.length == 1
+  md = %r{https?://([^/]+)/(?:.+/)?([^/]+)/([^/]+)/pull/(\d+)}.match(ARGV.first)
+  invalid_syntax unless md
+  host, owner, repo, pull_request_number = md.captures
+elsif ARGV.length == 4
+  host, owner, repo, pull_request_number = ARGV
+else
+  invalid_syntax
+end
+
+pull_request_number = pull_request_number.to_i
+Dokumi::Command.review_and_report host, owner, repo, pull_request_number, environment_options

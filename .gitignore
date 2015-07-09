@@ -1,0 +1,6 @@
+work/
+source/
+vendor/bundle/
+.bundle/
+config/*.yml
+custom/

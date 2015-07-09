@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname($0), "..", "lib"))
+require "dokumi"
+
+def invalid_syntax
+  error_message = <<-END
+syntax:
+$ #{$0} host owner repo branch_or_tag
+$ #{$0} host owner/repo branch_or_tag
+$ #{$0} repo-url branch_or_tag
+$ #{$0} tree-url
+  END
+  raise error_message
+end
+
+environment_options = Dokumi::Command.extract_environment_options
+
+if ARGV.length == 4
+  host, owner, repo, branch_or_tag_name = ARGV
+elsif ARGV.length == 3
+  host, repository, branch_or_tag_name = ARGV
+  invalid_syntax unless repository.include?("/")
+  owner, repo = repository.split("/")
+elsif ARGV.length == 2
+  url, branch_or_tag_name = ARGV
+  md = %r{https?://([^/]+)/(?:.+/)?([^/]+)/([^/]+)/?}.match(ARGV.first)
+  invalid_syntax unless md
+  host, owner, repo = md.captures
+elsif ARGV.length == 1
+  md = %r{https?://([^/]+)/(?:.+/)?([^/]+)/([^/]+)/tree/([^/]+)}.match(ARGV.first)
+  invalid_syntax unless md
+  host, owner, repo, branch_or_tag_name = md.captures
+else
+  invalid_syntax
+end
+
+Dokumi::Command.archive host, owner, repo, branch_or_tag_name, environment_options

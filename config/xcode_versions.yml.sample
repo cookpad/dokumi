@@ -1,0 +1,3 @@
+6.3.2: "/Applications/Xcode.app"
+6.2: "/Applications/Xcode 6.2.app"
+default: "6.3.2"
