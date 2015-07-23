@@ -29,7 +29,7 @@ module Dokumi
       def infer(target_project)
         @environment.action_executed = true
 
-        Support::Shell.run("infer", "--", "./gradlew", "build")
+        Support::Shell.run({"ANDROID_HOME" => @configuration[:android_home]}, "infer", "--", "./gradlew", "build")
         Infer.parse_report(target_project).each do |bug|
           @environment.add_issue(
               file_path: bug[:file_path],
