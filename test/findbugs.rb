@@ -6,7 +6,7 @@ require "dokumi"
 
 class TestFindbugs < Minitest::Test
   def build_script
-    File.expand_path(File.join(File.dirname($0), "build", "dokumi-test-android.rb"))
+    File.expand_path(File.join(File.dirname($0), "build", "dokumi-test-android-findbugs.rb"))
   end
 
   def test_static_analysis

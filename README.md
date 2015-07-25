@@ -95,6 +95,7 @@ To build an application you also have the `bin/archive` command.
 
 Run the tests <a name="run_tests"></a>
 -------------
+
 First you need to make sure you have all the required gems installed:
 ```
 bundle install
@@ -105,8 +106,21 @@ Then to run the iOS tests:
 bundle exec test/review_xcode_project.rb
 ```
 
+Supported analysis tools
+-----------------------
+
+### iOS
+
+- [xcodebuild](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/xcodebuild.1.html)
+
+### Android
+
+- [Findbugs](https://docs.gradle.org/current/dsl/org.gradle.api.plugins.quality.FindBugs.html)
+- [Infer](http://fbinfer.com/)
+
 How to use Dokumi with Jenkins
 ------------------------------
+
 If you are using the GitHub pull request builder plugin, making it executing the following might be enough:
 ```shell
 set -e
