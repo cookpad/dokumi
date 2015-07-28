@@ -21,14 +21,14 @@ GEM
       mini_portile (~> 0.6.0)
     octokit (4.0.1)
       sawyer (~> 0.6.0, >= 0.5.3)
-    rugged (0.22.2)
+    rugged (0.23.0)
     sawyer (0.6.0)
       addressable (~> 2.3.5)
       faraday (~> 0.8, < 0.10)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    xcodeproj (0.26.1)
+    xcodeproj (0.26.3)
       activesupport (>= 3)
       claide (~> 0.9.1)
       colored (~> 1.2)
@@ -43,4 +43,4 @@ DEPENDENCIES
   xcodeproj
 
 BUNDLED WITH
-   1.10.5
+   1.10.6
