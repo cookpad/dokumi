@@ -141,8 +141,8 @@ module Dokumi
         private
 
         def find_files_in_project
-          paths = []
-          @xcodeproj.files.map(&:real_path).select do |project_file_path|
+          files = @xcodeproj.files.map {|file| file.real_path rescue nil }.compact.uniq
+          files.select do |project_file_path|
             to_keep = yield project_file_path
           end
         end
