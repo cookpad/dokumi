@@ -11,7 +11,7 @@ class TestReviewXcodeProject < Minitest::Test
 
   def test_review_without_error
     issues = Dokumi::Command.review("github.com", "cookpad", "dokumi-test", 1, skip_comment_creation: true, build_script: build_script)
-    assert issues.empty?
+    assert_equal [], issues
   end
 
   def test_review_with_failing_test
@@ -53,5 +53,16 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal Dokumi::Support.make_pathname("dokumi-test-ios/AppDelegate.m"), issue[:file_path]
     assert_equal :error, issue[:type]
     assert_equal 10, issue[:line]
+  end
+
+  def test_important_warning_removed
+    issues = Dokumi::Command.review("github.com", "cookpad", "dokumi-test", 10, skip_comment_creation: true, build_script: build_script)
+    assert_equal 4, issues.length
+    issues.each do |issue|
+      assert_nil issue[:file_path]
+      assert_nil issue[:line]
+      assert_equal :error, issue[:type]
+      assert_includes issue[:description], "GCC_WARN_UNDECLARED_SELECTOR"
+    end
   end
 end

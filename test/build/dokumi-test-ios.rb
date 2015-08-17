@@ -10,11 +10,10 @@ xcode.install_pods if File.exist?("Podfile")
 
 case action
 when :review
+  xcode.require_warnings to_build, scheme: scheme, "GCC_WARN_UNDECLARED_SELECTOR" => "YES"
   xcode.find_unchanged_storyboards
-  xcode.analyze to_build, scheme: scheme
-  unless error_found?
-    xcode.test to_build, scheme: scheme, destination: simulator_destinations
-  end
+  xcode.analyze(to_build, scheme: scheme) unless error_found?
+  xcode.test(to_build, scheme: scheme, destination: simulator_destinations) unless error_found?
 else
   raise "unknown action #{action.inspect}"
 end

@@ -1,6 +1,7 @@
 require_relative "xcode/project_helper"
 require_relative "xcode/unchanged_storyboard_finder"
 require_relative "xcode/error_extractor"
+require_relative "xcode/project_checker"
 
 module Dokumi
   module Tool
@@ -16,6 +17,11 @@ module Dokumi
         configuration = self.class.read_configuration
         raise "Xcode version #{version} is not configured in xcode_versions.yml" unless configuration[version]
         @xcode_version = version
+      end
+
+      def require_warnings(xcodeproj_path, *warnings)
+        @environment.action_executed = true
+        Xcode::ProjectChecker.new(@environment, xcodeproj_path).require_warnings(*warnings)
       end
 
       def modify_project(xcodeproj_path)
