@@ -501,17 +501,17 @@ module Dokumi
           configuration_description = %{On build configuration "#{configuration_name}" of target "#{target_name}", please}
           place = find_setting_with_flag(flag_wanted)
           if place
-            @environment.add_issue type: :error, description: %{#{configuration_description} change the setting #{place[:setting_name]} ("#{place[:setting][:description]}") to #{place[:value]}.}
+            @environment.add_issue type: :error, description: %{#{configuration_description} change the setting `#{place[:setting_name]}` ("#{place[:setting][:description]}") to `#{place[:value]}`.}
             return
           end
           if state_wanted == :error
             place = find_setting_with_flag("-W#{warning}")
             if place
-              @environment.add_issue type: :error, description: %{#{configuration_description} change the setting #{place[:setting_name]} ("#{place[:setting][:description]}") and GCC_TREAT_WARNINGS_AS_ERRORS ("Treat Warnings as Errors") to YES, or add "#{flag_wanted}" to WARNING_CFLAGS ("Other Warning Flags").}
+              @environment.add_issue type: :error, description: %{#{configuration_description} make sure the settings `#{place[:setting_name]}` ("#{place[:setting][:description]}") and `GCC_TREAT_WARNINGS_AS_ERRORS` ("Treat Warnings as Errors") are both set to `YES`, or add `#{flag_wanted}` to `WARNING_CFLAGS` ("Other Warning Flags").}
               return
             end
           end
-          @environment.add_issue type: :error, description: %{#{configuration_description} add "#{flag_wanted}" to WARNING_CFLAGS ("Other Warning Flags").}
+          @environment.add_issue type: :error, description: %{#{configuration_description} add `#{flag_wanted}` to `WARNING_CFLAGS` ("Other Warning Flags").}
         end
 
         def require_warnings(*warnings)
