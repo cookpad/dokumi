@@ -516,8 +516,10 @@ module Dokumi
 
         def require_warnings(*warnings)
           schemes = nil
-          schemes = warnings.last.delete(:scheme) if warnings.last.is_a?(Hash)
-          warnings_wanted = resolve_warnings(wanted_warnings_to_flags(*warnings))
+          warnings = warnings.flatten
+          warnings_hash = Support.extract_options!(warnings).dup
+          schemes = warnings_hash.delete(:scheme)
+          warnings_wanted = resolve_warnings(wanted_warnings_to_flags(*warnings, warnings_hash))
 
           build_configurations_used = Set.new
           if schemes
