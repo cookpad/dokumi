@@ -163,8 +163,8 @@ module Dokumi
         configuration = self.class.read_configuration
         xcode_version = @xcode_version
         if xcode_version == :default and @environment.local_configuration[:xcode_version]
-          xcode_version = @environment.local_configuration[:xcode_version]
-          xcode_version = :default if xcode_version.to_s.downcase == "default"
+          xcode_version = @environment.local_configuration[:xcode_version].to_s
+          xcode_version = :default if xcode_version.downcase == "default"
         end
         if xcode_version == :default
           xcode_version = configuration[:default]
@@ -205,7 +205,7 @@ module Dokumi
         error_extractor = ErrorExtractor.new(@environment)
         Support.logger.info "running #{args.inspect}"
         exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
-          Support.logger.debug "#{output_type.to_s.upcase[0..2]}: #{line}"
+          Support.logger.debug "#{output_type.to_s.upcase[0..2]}: #{line.chomp}"
           error_extractor.process_line(output_type, line)
         end
         error_extractor.flush
