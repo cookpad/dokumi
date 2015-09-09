@@ -57,7 +57,6 @@ module Dokumi
           else
             return false
           end
-          puts line # still output the line with error or warning
           issue_type = clean_up_issue_type(issue_type)
           @new_error_found = true if issue_type == :error
           issue = {

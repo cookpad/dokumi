@@ -28,7 +28,7 @@ module Dokumi
         end
 
         def initialize(source, directory)
-          @directory = directory.is_a?(Pathname) ? directory : Pathname.new(directory)
+          @directory = Support.make_pathname(directory)
           @source = source
           source_has_base = source.respond_to?(:base)
 
@@ -74,9 +74,9 @@ module Dokumi
         end
 
         def change_directory(&block)
-          STDERR.puts "changing directory to #{directory}" if Dokumi.verbose?
+          Support.logger.debug "changing directory to #{directory}"
           Dir.chdir(directory, &block)
-          STDERR.puts "changing directory back to #{Dir.pwd}" if Dokumi.verbose? and block != nil
+          Support.logger.debug "changing directory back to #{Dir.pwd}" if block
         end
 
         def file_in_head?(file_path)

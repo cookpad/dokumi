@@ -1,7 +1,7 @@
 module Dokumi
   module Command
     def self.archive(host, owner, repo, branch_or_tag_name, environment_options = {})
-      prepare_directories_and_options host, owner, repo, environment_options
+      environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: :archive)
 
       type, branch_or_tag_name = VersionControl::GitHub.branch_or_tag(host, owner, repo, branch_or_tag_name)
       if type == :branch
@@ -20,7 +20,7 @@ module Dokumi
     end
 
     def self.review(host, owner, repo, pull_request_number, environment_options = {})
-      prepare_directories_and_options host, owner, repo, environment_options
+      environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: :review)
 
       pull_request = VersionControl::GitHub::PullRequest.new(host, owner, repo, pull_request_number)
       local_copy = pull_request.fetch_into(environment_options[:source_directory])
@@ -41,33 +41,47 @@ module Dokumi
       issues = review(host, owner, repo, pull_request_number, environment_options)
 
       if issues.length == 0
-        puts "great, no issue found"
+        Support.logger.info "great, no issue found"
         exit true
       else
-        puts "issues found:"
+        Support.logger.warn "issues found:"
         issues.each do |issue|
-          puts "- #{issue[:file_path]}:#{issue[:line]}: #{issue[:description]}"
+          Support.logger.warn "- #{issue[:file_path]}:#{issue[:line]}: #{issue[:description]}"
         end
         if issues.all? {|issue| issue[:type] == :warning }
-          puts "warnings only - should be fixed but not considered a failure"
+          Support.logger.warn "warnings only - should be fixed but not considered a failure"
           exit true
         else
-          puts "exiting in error"
+          Support.logger.warn "exiting in error"
           exit false
         end
       end
     end
 
+    LOG_FILES_MAX_COUNT = 20
     def self.prepare_directories_and_options(host, owner, repo, environment_options)
       repository = {owner: owner, repo: repo}
+      environment_options = environment_options.dup
 
-      work_directory = Support.make_pathname(environment_options[:work_directory])
-      if work_directory and work_directory.exist?
-        puts "warning: removing #{work_directory}"
-      else
-        work_directory = BASE_DIRECTORY.join("work", host, owner, repo)
+      log_directory = Support.make_pathname(environment_options[:log_directory])
+      unless log_directory
+        log_directory = BASE_DIRECTORY.join("work", "log", host, owner, repo)
       end
-      environment_options[:work_directory] = work_directory
+      log_directory.mkpath
+      log_file_name_prefix = environment_options[:action]
+      older_log_file_paths = Pathname.glob(log_directory.join("#{log_file_name_prefix}-*.log")).sort
+      if older_log_file_paths.length > LOG_FILES_MAX_COUNT - 1 # -1 to count the new log file that is going to be created
+        count_to_delete = older_log_file_paths.length - LOG_FILES_MAX_COUNT + 1
+        older_log_file_paths[0...count_to_delete].each {|file_path| file_path.unlink }
+      end
+      log_file_path = log_directory.join("#{log_file_name_prefix}-#{Time.new.strftime("%Y%m%d-%H%M%S%L")}.log")
+      Support.logger.info "Creating log file #{log_file_path}"
+      file_logger = Logger.new(log_file_path)
+      file_logger.level = Logger::DEBUG
+      stdout_logger = Logger.new(STDOUT)
+      stdout_logger.level = Logger::INFO
+      Support.logger = Support::MultiLogger.new(stdout_logger, file_logger)
+
       environment_options[:source_directory] = BASE_DIRECTORY.join("source", host, owner, repo)
       if environment_options[:build_script]
         build_script_path = Support.make_pathname(environment_options.delete(:build_script))
@@ -78,11 +92,20 @@ module Dokumi
         build_script_path = BASE_DIRECTORY.join("custom", "build", "fallback.rb") unless build_script_path.exist?
         raise "Cannot find a build script for the #{owner}/#{repo} repository on #{host}." unless build_script_path.exist?
       end
-      puts "building with script #{build_script_path}"
+      Support.logger.info "building with script #{build_script_path}"
       environment_options[:build_script_path] = build_script_path
 
+      work_directory = Support.make_pathname(environment_options[:work_directory])
+      if work_directory and work_directory.exist?
+        Support.logger.warn "warning: removing #{work_directory}"
+      else
+        work_directory = BASE_DIRECTORY.join("work", host, owner, repo)
+      end
+      environment_options[:work_directory] = work_directory
       work_directory.rmtree if work_directory.exist?
       work_directory.mkpath
+
+      environment_options
     end
 
     def self.extract_environment_options

@@ -143,7 +143,6 @@ module Dokumi
         end
         Support::Shell.run *command
         Support::Shell.popen_each_line(*command) do |type, line|
-          puts line
           if type == :error and line.start_with?("[!] ")
             description = line.sub("[!] ", "").strip
             @environment.add_issue type: :warning, description: description
@@ -198,29 +197,18 @@ module Dokumi
         args << options[:actions]
         args.flatten!
 
-        log_file_path = @environment.work_directory.join("xcodebuild-#{Time.new.strftime("%Y%m%d-%H%M%S%L")}.log")
         exit_code = nil
         error_extractor = ErrorExtractor.new(@environment)
-        File.open(log_file_path, "w") do |log_file|
-          log_file.puts "running #{args.inspect}"
-          puts "redirecting output to #{log_file_path}"
-          exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
-            log_file.puts "#{output_type.to_s.upcase[0..2]}: #{line}"
-            error_extractor.process_line(output_type, line)
-          end
-          error_extractor.flush
+        Support.logger.info "running #{args.inspect}"
+        exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
+          Support.logger.debug "#{output_type.to_s.upcase[0..2]}: #{line}"
+          error_extractor.process_line(output_type, line)
         end
-        puts # make some space
+        error_extractor.flush
 
         if exit_code != 0 and !error_extractor.new_error_found
           raise "unkown error (#{exit_code}) happened while running xcodebuild"
         end
-      rescue
-        if log_file_path and log_file_path.exist?
-          STDERR.puts "An error occurred - displaying the 200 last lines of the log."
-          STDERR.puts `tail -200 #{log_file_path.to_s.shellescape}`
-        end
-        raise
       end
 
       def self.read_configuration

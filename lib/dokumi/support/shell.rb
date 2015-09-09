@@ -13,7 +13,7 @@ module Dokumi
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
         args = args.map {|arg| arg.to_s }
-        STDERR.puts "reading outputs of #{args.inspect}" if Dokumi.verbose? and !options[:silent]
+        Support.logger.debug "reading outputs of #{args.inspect}"
         exit_status = nil
         with_clean_env do
           exit_status = Open3.popen3(*args) do |stdin, stdout, stderr, wait_thread|
@@ -47,7 +47,7 @@ module Dokumi
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
         args = args.map {|arg| arg.is_a?(Pathname) ? arg.to_s : arg }
-        STDERR.puts "running #{args.inspect}" if Dokumi.verbose? and !options[:silent]
+        Support.logger.debug "running #{args.inspect}"
         with_clean_env do
           system(*args)
         end

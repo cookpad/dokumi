@@ -4,7 +4,6 @@ Just some random ideas to improve Dokumi, in no particular order.
 - Use a default simulator destination when the user doesn't specify it in the build file, depending on the Xcode version used.
 - A review only ends in error when an error was found. We should maybe exit in error for a warning on a line directly modified by the pull request.
 - Log handling is not consistent. Ideas of what could be done:
-  - Don't use `puts`, but a real logging system.
   - Add time to each log line. That would allow to easily see what took too much time.
   - The `xcodebuild` logs are too big to be logged with the rest, but they are currently removed before every new build. We should compress them and keep at least the last 20 or so.
 - More and better documentation would be nice.

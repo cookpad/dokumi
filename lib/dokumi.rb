@@ -12,13 +12,10 @@ require "pp"
 require "json"
 require "tmpdir"
 require "nokogiri"
+require "logger"
 
 module Dokumi
   BASE_DIRECTORY = Pathname.new(__FILE__).dirname.parent.realpath
-
-  def self.verbose?
-    true
-  end
 end
 
 require "dokumi/support"

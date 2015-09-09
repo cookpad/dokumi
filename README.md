@@ -55,7 +55,7 @@ when :review
 when :archive
   xcode.archive to_build, scheme: scheme
   artifacts.each do |artifact_path|
-    puts "#{artifact_path} should be uploaded or copied somewhere"
+    Support.logger.info "#{artifact_path} should be uploaded or copied somewhere"
   end
 else
   raise "unknown action #{action.inspect}"
