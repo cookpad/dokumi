@@ -162,6 +162,10 @@ module Dokumi
 
         configuration = self.class.read_configuration
         xcode_version = @xcode_version
+        if xcode_version == :default and @environment.local_configuration[:xcode_version]
+          xcode_version = @environment.local_configuration[:xcode_version]
+          xcode_version = :default if xcode_version.to_s.downcase == "default"
+        end
         if xcode_version == :default
           xcode_version = configuration[:default]
           raise "either set an explicit version of Xcode in the build script, or set a default Xcode version in xcode_versions.yml" unless xcode_version

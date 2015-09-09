@@ -93,6 +93,18 @@ module Dokumi
       define_method(option_type) { @options[option_type] }
     end
 
+    def local_configuration
+      return @local_configuration if @local_configuration
+      configuration_path = source_directory.join("dokumi.yml")
+      if configuration_path.exist?
+        @local_configuration = YAML.load(IO.read(configuration_path))
+        @local_configuration = Support.symbolize_keys(@local_configuration)
+      else
+        @local_configuration = {}
+      end
+      @local_configuration.freeze
+    end
+
     def make_identifier_updater(replacements)
       lambda do |value|
         replacements.each do |to_replace, replacement|
