@@ -46,6 +46,7 @@ module Dokumi
         end
 
         def process_standard_error_line(line)
+          Support.logger.error line.chomp
         end
 
         def extract_simple_error(line)
@@ -104,9 +105,11 @@ module Dokumi
 
         def process_standard_output_line(line)
           if extract_simple_error(line)
+            Support.logger.warn line.chomp
             flush
             return
           end
+          Support.logger.debug line.chomp
           extract_linker_error(line)
         end
 

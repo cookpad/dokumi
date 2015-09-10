@@ -205,7 +205,6 @@ module Dokumi
         error_extractor = ErrorExtractor.new(@environment)
         Support.logger.info "running #{args.inspect}"
         exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
-          Support.logger.debug "#{output_type.to_s.upcase[0..2]}: #{line.chomp}"
           error_extractor.process_line(output_type, line)
         end
         error_extractor.flush
