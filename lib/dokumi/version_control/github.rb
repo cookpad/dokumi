@@ -138,6 +138,8 @@ module Dokumi
           else
             @github_client.add_comment(repo, @number, comment[:body])
           end
+        rescue Octokit::UnprocessableEntity => e
+          Support.logger.error "Error posting comment #{comment.inspect}: #{e.inspect}"
         end
 
         def has_comment?(comment)
