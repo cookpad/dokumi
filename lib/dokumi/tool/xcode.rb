@@ -210,7 +210,7 @@ module Dokumi
         error_extractor.flush
 
         if exit_code != 0 and !error_extractor.new_error_found
-          raise "unkown error (#{exit_code}) happened while running xcodebuild"
+          raise "unknown error (#{exit_code}) happened while running xcodebuild"
         end
       end
 
