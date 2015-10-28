@@ -41,7 +41,7 @@ module Dokumi
           @xcodeproj = Xcodeproj::Project.open(@xcodeproj_path)
         end
 
-        # Set the code signing identity of all the build settings in the project to the value given.
+        # Set the code signing identity in all the build settings in the project to the value given.
         def code_signing_identity=(value)
           each_build_settings do |build_settings|
             build_settings.keys.each do |setting_name|
@@ -52,7 +52,7 @@ module Dokumi
           @xcodeproj.save
         end
 
-        # Set the provisioning profile of all the build settings in the project to the value given.
+        # Set the provisioning profile in all the build settings in the project to the value given.
         def provisioning_profile=(value)
           each_build_settings do |build_settings|
             build_settings.keys.each do |setting_name|
@@ -72,6 +72,23 @@ module Dokumi
             attributes["TargetAttributes"][target.uuid]["DevelopmentTeam"] = value
           end
           @xcodeproj.save
+        end
+
+        # Update all the values of a specific build setting in the project.
+        def update_existing_build_setting_values(setting_name_to_update, &block)
+          each_build_settings do |build_settings|
+            build_settings.keys.each do |setting_name|
+              if setting_name_to_update == setting_name or setting_name.start_with?("#{setting_name_to_update}[")
+                build_settings[setting_name] = block.call(build_settings[setting_name])
+              end
+            end
+          end
+          @xcodeproj.save
+        end
+
+        # Update all the values of the PRODUCT_BUNDLE_IDENTIFIER build setting in the project.
+        def update_product_bundle_identifier(&block)
+          update_existing_build_setting_values("PRODUCT_BUNDLE_IDENTIFIER", &block)
         end
 
         # To update every entitlement file in the project.
