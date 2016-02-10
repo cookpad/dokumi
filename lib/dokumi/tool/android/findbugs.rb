@@ -12,7 +12,7 @@ module Dokumi
 
               report.xpath("//BugInstance").map do |info|
                 source_path = info.xpath("SourceLine/@sourcepath").first.to_s
-                file_path = Pathname.pwd.join(target_project, "src/main/java", source_path)
+                file_path = Pathname.new(target_project).join("src/main/java", source_path)
 
                 {
                     description: info.xpath("LongMessage/text()").first.to_s,
