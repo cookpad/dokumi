@@ -22,6 +22,7 @@ module Dokumi
               line: bug[:line],
               type: :static_analysis,
               description: bug[:description],
+              priority: bug[:priority],
           )
         end
       end
