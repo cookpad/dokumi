@@ -11,6 +11,7 @@ module Dokumi
               report = Nokogiri::XML(file)
 
               report.xpath("//BugInstance").map do |info|
+                priority = info.attribute('priority').value
                 source_path = info.xpath("SourceLine/@sourcepath").first.to_s
                 file_path = Support.make_pathname(target_project).join("src/main/java", source_path)
 
@@ -18,6 +19,7 @@ module Dokumi
                     description: info.xpath("LongMessage/text()").first.to_s,
                     file_path: file_path,
                     line: info.xpath("SourceLine/@start").first.to_s.to_i,
+                    type: priority.to_i > 1 ? :warning : :error,
                 }
               end
             end

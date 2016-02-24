@@ -168,9 +168,9 @@ module Dokumi
           when :static_analysis
             "**Static Analysis:** #{issue[:description]}"
           when :warning
-            "**Warning:** #{issue[:description]}"
+            "**Warning(#{issue[:tool].to_s}):** #{issue[:description]}"
           when :error
-            "**Error:** #{issue[:description]}"
+            "**Error(#{issue[:tool].to_s}):** #{issue[:description]}"
           else
             raise "Unknown issue type #{issue[:type]}"
           end

@@ -20,8 +20,9 @@ module Dokumi
           @environment.add_issue(
               file_path: bug[:file_path],
               line: bug[:line],
-              type: :static_analysis,
+              type: bug[:type],
               description: bug[:description],
+              tool: :findbugs,
           )
         end
       end
