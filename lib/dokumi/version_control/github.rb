@@ -165,8 +165,6 @@ module Dokumi
         def self.markdown_for_issue(issue)
           Support.validate_hash issue, requires: [:type, :description]
           case issue[:type]
-          when :static_analysis
-            "**Static Analysis:** #{issue[:description]}"
           when :warning
             "**Warning(#{issue[:tool].to_s}):** #{issue[:description]}"
           when :error

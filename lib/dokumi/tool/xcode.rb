@@ -58,7 +58,7 @@ module Dokumi
               file_path: content["files"][location["file"]],
               line: location["line"].to_i,
               column: location["col"].to_i,
-              type: :static_analysis,
+              type: :warning,
               description: diagnostic["description"],
             )
           end
