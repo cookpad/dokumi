@@ -48,7 +48,7 @@ module Dokumi
         issues.each do |issue|
           Support.logger.warn "- #{issue[:file_path]}:#{issue[:line]}: #{issue[:description]}"
         end
-        if issues.all? {|issue| issue[:type] == :warning }
+        if issues.all? {|issue| issue[:type] == :warning || (issue[:type] == :static_analysis && issue[:priority].to_i > 1)}
           Support.logger.warn "warnings only - should be fixed but not considered a failure"
           exit true
         else
