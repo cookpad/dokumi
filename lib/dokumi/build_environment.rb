@@ -41,7 +41,7 @@ module Dokumi
 
     VALID_ISSUE_TYPES = [:warning, :error]
     def add_issue(new_issue)
-      Support.validate_hash new_issue, requires: [:type, :description], can_also_have: [:file_path, :line, :column]
+      Support.validate_hash new_issue, requires: [:type, :description], can_also_have: [:file_path, :line, :column, :tool]
       raise "an issue type has to be one of #{VALID_ISSUE_TYPES.inspect}" unless VALID_ISSUE_TYPES.include?(new_issue[:type])
 
       new_issue[:tool] ||= :compiler
