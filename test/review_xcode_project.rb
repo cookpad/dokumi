@@ -36,7 +36,8 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal 1, issues.length
     issue = issues.first
     assert_equal Dokumi::Support.make_pathname("dokumi-test-ios/ViewController.m"), issue[:file_path]
-    assert_equal :static_analysis, issue[:type]
+    assert_equal :static_analyzer, issue[:tool]
+    assert_equal :warning, issue[:type]
   end
 
   def test_review_with_linker_error

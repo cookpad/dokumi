@@ -15,8 +15,12 @@ class TestFindbugs < Minitest::Test
 
     issues.each do |issue|
       assert_equal Dokumi::Support.make_pathname("app/src/main/java/com/cookpad/android/dokumiTestAndroid/MainActivity.java"), issue[:file_path]
-      assert_equal :static_analysis, issue[:type]
+      assert_equal :findbugs, issue[:tool]
     end
+    assert_equal :error, issues[0][:type]
+    assert_equal :warning, issues[1][:type]
+    assert_equal :warning, issues[2][:type]
+    assert_equal :error, issues[3][:type]
     assert_equal 46, issues[0][:line]
     assert_equal 46, issues[1][:line]
     assert_equal 50, issues[2][:line]
