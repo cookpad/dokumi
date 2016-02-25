@@ -41,12 +41,10 @@ module Dokumi
 
     VALID_ISSUE_TYPES = [:warning, :error]
     def add_issue(new_issue)
-      Support.validate_hash new_issue, requires: [:type, :description, :tool], can_also_have: [:file_path, :line, :column]
+      Support.validate_hash new_issue, requires: [:type, :description], can_also_have: [:file_path, :line, :column]
       raise "an issue type has to be one of #{VALID_ISSUE_TYPES.inspect}" unless VALID_ISSUE_TYPES.include?(new_issue[:type])
 
-      if new_issue[:tool].nil?
-        new_issue[:tool] = :compiler
-      end
+      new_issue[:tool] ||= :compiler
 
       if new_issue[:file_path]
         file_path = Support.make_pathname(new_issue[:file_path])
@@ -64,9 +62,9 @@ module Dokumi
 
       similar_issue = @issues[similar_issue_index]
 
-      # if a similar issue is present, keep the strongest type: error > static_analysis > warning
+      # if a similar issue is present, keep the strongest type: error > warning
       return if similar_issue[:type] == :error or similar_issue[:type] == new_issue[:type]
-      @issues[similar_issue_index] = new_issue if :error.include?(new_issue[:type])
+      @issues[similar_issue_index] = new_issue if new_issue[:type] == :error
     end
 
     def add_artifacts(*artifacts)

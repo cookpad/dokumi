@@ -59,6 +59,7 @@ module Dokumi
               line: location["line"].to_i,
               column: location["col"].to_i,
               type: :warning,
+              tool: :static_analyzer,
               description: diagnostic["description"],
             )
           end
