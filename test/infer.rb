@@ -15,7 +15,8 @@ class TestInfer < Minitest::Test
 
     issues.each do |issue|
       assert_equal Dokumi::Support.make_pathname("app/src/main/java/com/cookpad/android/dokumiTestAndroid/MainActivity.java"), issue[:file_path]
-      assert_equal :static_analysis, issue[:type]
+      assert_equal :infer, issue[:tool]
+      assert_equal :warning, issue[:type]
     end
     assert_equal 52, issues[0][:line]
     assert_equal 71, issues[1][:line]

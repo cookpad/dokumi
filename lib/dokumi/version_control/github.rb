@@ -164,13 +164,12 @@ module Dokumi
 
         def self.markdown_for_issue(issue)
           Support.validate_hash issue, requires: [:type, :description]
+          tool_name = issue[:tool].to_s.capitalize.gsub(/_[a-z]/) {|string| " " + string[-1].upcase }
           case issue[:type]
-          when :static_analysis
-            "**Static Analysis:** #{issue[:description]}"
           when :warning
-            "**Warning:** #{issue[:description]}"
+            "**#{tool_name} Warning:** #{issue[:description]}"
           when :error
-            "**Error:** #{issue[:description]}"
+            "**#{tool_name} Error:** #{issue[:description]}"
           else
             raise "Unknown issue type #{issue[:type]}"
           end
