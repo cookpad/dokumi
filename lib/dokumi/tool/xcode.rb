@@ -156,6 +156,11 @@ module Dokumi
         UnchangedStoryboardFinder.find_issues @environment
       end
 
+      def find_misplaced_constraints
+        @environment.action_executed = true
+        MisplacedConstraintFinder.find_issues @environment
+      end
+
       private
 
       def xcodebuild(project_path, options)
