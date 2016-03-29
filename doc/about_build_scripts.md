@@ -40,7 +40,8 @@ The main features available are the following:
 - `test(project_path, options)`: To run the application's automatic tests, like Xcode's Test command. You must specify the Scheme to build with the `:scheme` option, and the Simulator destination with the `:destination` option. You can specify just one destination `"platform=iOS Simulator,OS=8.4,name=iPhone 4s"` or multiple `["platform=iOS Simulator,OS=8.4,name=iPhone 4s", "platform=iOS Simulator,OS=8.4,name=iPhone 6"]` if you want. Running tests in the simulator for an old iPhone like the iPhone 4s, and in the simulator for a recent iPhone like the iPhone 6 makes sure your tests run in both 32 and 64-bit.
 - `archive(project_path, options)`: To build an archive (IPA file) of the project, like Xcode's Archive command. You must specify the Scheme to build with the `:scheme` option.
 - `install_pods`: To run `pod install` in the current directory. It will guess what version of CocoaPods to run, either by using bundler if a `Gemfile` file is present, or by looking at the version written in `Podfile.lock`
-- `find_unchanged_storyboards`: Look if the pull request contains any Storyboard of XIB file that has been modified but the only modification is the Xcode version used to write the file.
+- `find_unchanged_storyboards`: Look if the pull request contains any Storyboard or XIB file that has been modified but the only modification is the Xcode version used to write the file.
+- `find_misplaced_constraints`: Look if the pull request contains any Storyboard or XIB file that has misplaced constraints.
 
 Tools
 ------
