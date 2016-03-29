@@ -66,4 +66,12 @@ class TestReviewXcodeProject < Minitest::Test
       assert_includes issue[:description], "GCC_WARN_UNDECLARED_SELECTOR"
     end
   end
+
+  def test_review_with_misplaced_xib
+    issues = Dokumi::Command.review("github.com", "cookpad", "dokumi-test", 11, skip_comment_creation: false, build_script: build_script)
+    assert_equal 1, issues.length
+    issue = issues.first
+    assert_equal Dokumi::Support.make_pathname("MainViewController.xib"), issue[:file_path]
+    assert_equal :error, issue[:type]
+  end
 end

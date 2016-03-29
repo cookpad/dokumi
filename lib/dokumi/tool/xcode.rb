@@ -1,5 +1,6 @@
 require_relative "xcode/project_helper"
 require_relative "xcode/unchanged_storyboard_finder"
+require_relative "xcode/misplaced_constraint_finder"
 require_relative "xcode/error_extractor"
 require_relative "xcode/project_checker"
 
