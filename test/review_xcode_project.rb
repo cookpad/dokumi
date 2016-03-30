@@ -72,6 +72,9 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal 1, issues.length
     issue = issues.first
     assert_equal Dokumi::Support.make_pathname("MainViewController.xib"), issue[:file_path]
-    assert_equal :error, issue[:type]
+    assert_equal :warning, issue[:type]
+    assert_equal issue[:tool], :misplaced_constraint_finder
+    assert_equal 14, issue[:line]
+    assert_includes issue[:description], "This constraint is misplaced."
   end
 end
