@@ -3,6 +3,18 @@ module Dokumi
     class Xcode
       # Checks if a pull request contains XIB/Storyboard files with the only change being the Xcode version used to save the file.
       class UnchangedStoryboardFinder
+        def self.read_xml_tag(text)
+          h = {}
+          s = StringScanner.new(text)
+          return nil unless s.scan(/\s*<([a-zA-Z][a-zA-Z0-9]*)/)
+          tag_type = s[1].to_sym
+          while s.scan(/\s*([a-zA-Z][a-zA-Z0-9]*)=(?:["'])([^"']+)(["'])\s*/)
+            name, value = s[1], s[2]
+            h[name.to_sym] = value
+          end
+          return tag_type, h
+        end
+
         def self.find_issues(environment)
           local_copy = environment.options[:local_copy]
           raise "The local copy information is needed to find unchanged files." unless local_copy
@@ -23,7 +35,7 @@ module Dokumi
               hunk.each_line do |line|
                 next unless line.deletion? or line.addition? or line.content.strip.empty?
                 line_content = line.content
-                tag_type, attributes = Support::XML.read_xml_tag(line_content)
+                tag_type, attributes = read_xml_tag(line_content)
                 if tag_type == :document
                   attributes.delete(:toolsVersion)
                   attributes.delete(:systemVersion)

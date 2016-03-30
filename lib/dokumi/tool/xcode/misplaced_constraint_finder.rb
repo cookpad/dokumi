@@ -1,7 +1,6 @@
 module Dokumi
   module Tool
     class Xcode
-      MisplacedStatus = Struct.new('MisplacedStatus', :file_path, :line_no)
       # Checks if a pull request contains XIB/Storyboard files which have misplaced constraints.
       class MisplacedConstraintFinder
         def self.find_issues(environment)
@@ -13,25 +12,16 @@ module Dokumi
             file_path = patch.delta.new_file[:path]
             next if file_path == nil or patch.delta.binary? or !/\.(storyboard|xib)\z/i.match(file_path)
 
-            patch.each_hunk do |hunk|
-              hunk.each_line do |line|
-                next unless line.deletion? or line.addition? or line.content.strip.empty?
-                line_content = line.content
-                tag_type, attributes = Support::XML.read_xml_tag(line_content)
-                if !attributes.nil? && attributes[:misplaced] == 'YES'
-                  misplaced_status = Struct::MisplacedStatus.new(file_path, line.new_lineno)
-                  misplaced_statuses << misplaced_status
-                end
-              end
+            doc = File.open(file_path) { |f| Nokogiri::XML.parse(f) }
+            misplaced_nodes = doc.css("[misplaced='YES']")
+            misplaced_nodes.each do |node|
+              environment.add_issue(
+                file_path: file_path,
+                line: diff.file_line_to_diff_line(file_path)[node.line],
+                type: :error,
+                description: "This constraint is misplaced.",
+              )
             end
-          end
-          misplaced_statuses.each do |status|
-            environment.add_issue(
-              file_path: status.file_path,
-              line: diff.file_line_to_diff_line(status.file_path)[status.line_no],
-              type: :error,
-              description: "This constraints is misplaced.",
-            )
           end
         end
       end
