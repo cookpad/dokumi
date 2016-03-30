@@ -18,7 +18,8 @@ module Dokumi
               environment.add_issue(
                 file_path: file_path,
                 line: diff.file_line_to_diff_line(file_path)[node.line],
-                type: :error,
+                type: :warning,
+                tool: :misplaced_constraint_finder,
                 description: "This constraint is misplaced.",
               )
             end
