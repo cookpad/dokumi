@@ -7,7 +7,6 @@ module Dokumi
           local_copy = environment.options[:local_copy]
           raise "The local copy information is needed to find unchanged files." unless local_copy
           diff = local_copy.diff_with_merge_base
-          misplaced_statuses = []
           diff.rugged_diff.each_patch do |patch|
             file_path = patch.delta.new_file[:path]
             next if file_path == nil or patch.delta.binary? or !/\.(storyboard|xib)\z/i.match(file_path)
