@@ -1,5 +1,6 @@
 require_relative "xcode/project_helper"
 require_relative "xcode/unchanged_storyboard_finder"
+require_relative "xcode/misplaced_constraint_finder"
 require_relative "xcode/error_extractor"
 require_relative "xcode/project_checker"
 
@@ -154,6 +155,11 @@ module Dokumi
       def find_unchanged_storyboards
         @environment.action_executed = true
         UnchangedStoryboardFinder.find_issues @environment
+      end
+
+      def find_misplaced_constraints
+        @environment.action_executed = true
+        MisplacedConstraintFinder.find_issues @environment
       end
 
       private
