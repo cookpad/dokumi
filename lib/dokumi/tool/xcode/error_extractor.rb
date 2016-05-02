@@ -39,7 +39,11 @@ module Dokumi
         def add_issue_if_needed
           if @undefined_symbol_details and !@undefined_symbol_details[:files].empty?
             description = "Cannot find symbol #{@undefined_symbol_details[:symbol]} referenced in #{@undefined_symbol_details[:files].join(", ")}"
-            @environment.add_issue(type: :error, description: description)
+            @environment.add_issue(
+              type: :error,
+              tool: :linker,
+              description: description,
+            )
             @new_error_found = true
           end
           @undefined_symbol_details = nil
@@ -60,15 +64,16 @@ module Dokumi
           end
           issue_type = clean_up_issue_type(issue_type)
           @new_error_found = true if issue_type == :error
-          issue = {
-            type: issue_type,
-            description: description,
-          }
+          issue = {}
+          if description.end_with?(" - FAIL")
+            issue[:tool] = :automatic_tests
+            description = description.sub(/ - FAIL\z/, "")
+          end
+          issue[:type] = issue_type
+          issue[:description] = description
           if file_path != "<unknown>"
-            issue.merge!(
-              file_path: file_path,
-              line: line_number.to_i,
-            )
+            issue[:file_path] = file_path
+            issue[:line] = line_number.to_i
             issue[:column] = column.to_i if column
           end
           @environment.add_issue issue

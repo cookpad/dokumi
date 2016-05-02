@@ -2,8 +2,8 @@ project_name = "dokumi-test-ios.xcodeproj"
 to_build = File.exist?("Podfile") ? "dokumi-test-ios.xcworkspace" : project_name
 scheme = "dokumi-test-ios"
 simulator_destinations = [
-  "platform=iOS Simulator,OS=8.4,name=iPhone 4s",
-  "platform=iOS Simulator,OS=8.4,name=iPhone 6",
+  "platform=iOS Simulator,OS=9.3,name=iPhone 4s",
+  "platform=iOS Simulator,OS=9.3,name=iPhone 6",
 ]
 
 xcode.install_pods if File.exist?("Podfile")

@@ -19,6 +19,7 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal 1, issues.length
     issue = issues.first
     assert_equal Dokumi::Support.make_pathname("dokumi-test-iosTests/dokumi_test_iosSuperTests.m"), issue[:file_path]
+    assert_equal :automatic_tests, issue[:tool]
     assert_equal :error, issue[:type]
     assert_equal 29, issue[:line]
   end
@@ -44,6 +45,7 @@ class TestReviewXcodeProject < Minitest::Test
     issues = Dokumi::Command.review("github.com", "cookpad", "dokumi-test", 5, skip_comment_creation: true, build_script: build_script)
     assert_equal 1, issues.length
     issue = issues.first
+    assert_equal :linker, issue[:tool]
     assert_equal :error, issue[:type]
   end
 
@@ -52,6 +54,7 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal 1, issues.length
     issue = issues.first
     assert_equal Dokumi::Support.make_pathname("dokumi-test-ios/AppDelegate.m"), issue[:file_path]
+    assert_equal :compiler, issue[:tool]
     assert_equal :error, issue[:type]
     assert_equal 10, issue[:line]
   end

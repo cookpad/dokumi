@@ -147,7 +147,10 @@ module Dokumi
         Support::Shell.popen_each_line(*command) do |type, line|
           if type == :error and line.start_with?("[!] ")
             description = line.sub("[!] ", "").strip
-            @environment.add_issue type: :warning, description: description
+            @environment.add_issue(
+              type: :warning,
+              description: description,
+            )
           end
         end
       end
