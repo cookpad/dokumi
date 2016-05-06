@@ -143,7 +143,8 @@ module Dokumi
       end
       build_environment = self.new(action, environment_options)
       build_environment.run_script(build_script_path)
-      raise "No action executed." unless build_environment.action_executed?
+      raise "No action executed." unless build_environment.action_executed? or build_environment.error_found?
+      raise "An error occured while building the archive." if action == :archive and build_environment.error_found?
       build_environment
     end
   end
