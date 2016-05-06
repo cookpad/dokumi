@@ -131,27 +131,63 @@ module Dokumi
 
       end
 
+      IGNORED_COCOAPODS_WARNINGS = [
+        "Please close any current Xcode sessions", # .xcworkspace file generated.
+        "This is a test version", # Newer version of CocoaPods available.
+      ]
       def install_pods
         raise "does not use CocoaPods" unless File.exist?("Podfile")
-        args = ["install"]
         if File.exist?("Gemfile")
           Support::Shell.run "bundle", "install"
-          command = ["bundle", "exec", "pod", *args]
+          pod_command = ["bundle", "exec", "pod"]
         elsif File.exist?("Podfile.lock")
           cocoapods_version = YAML.load(IO.read("Podfile.lock"))["COCOAPODS"]
-          command = ["pod", "_#{cocoapods_version}_", *args]
+          pod_command = ["pod", "_#{cocoapods_version}_"]
         else
-          command = ["pod", *args]
+          pod_command = ["pod"]
         end
-        Support::Shell.run *command
-        Support::Shell.popen_each_line(*command) do |type, line|
-          if type == :error and line.start_with?("[!] ")
-            description = line.sub("[!] ", "").strip
-            @environment.add_issue(
-              type: :warning,
-              description: description,
-            )
+        first_try = true
+        loop do
+          warnings_found = {output: [], error: []}
+          warning_not_finished = {output: false, error: false}
+          exit_code = Support::Shell.popen_each_line(*pod_command, "install", allow_errors: true) do |output_type, line|
+            line = line.chomp
+            case output_type
+            when :output
+              Support.logger.debug line
+            when :error
+              Support.logger.warn line
+            end
+            if line.start_with?("[!] ")
+              if IGNORED_COCOAPODS_WARNINGS.any? {|warning| line.include?(warning) }
+                warning_not_finished[output_type] = false
+              else
+                warnings_found[output_type] << line.sub("[!] ", "")
+                warning_not_finished[output_type] = line.end_with?(":")
+              end
+            elsif warning_not_finished[output_type]
+              warnings_found[output_type][-1] += "\n" + line
+            end
           end
+          exited_in_error = (exit_code != 0)
+          # CocoaPods 1.0 doesn't update the main repo automatically anymore,
+          # so update and retry if an error occured.
+          if first_try and exited_in_error
+            Support.logger.warn "An error occured during pod install, updating the CocoaPods specs repo before retrying."
+            first_try = false
+            Support::Shell.run *pod_command, "repo", "update", allow_errors: true
+            next
+          end
+          warnings_found.each do |output_type, messages|
+            messages.each do |message|
+              @environment.add_issue(
+                type: exited_in_error ? :error : :warning,
+                tool: :cocoapods,
+                description: message.strip,
+              )
+            end
+          end
+          break
         end
       end
 
