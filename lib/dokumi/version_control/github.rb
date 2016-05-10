@@ -194,9 +194,9 @@ module Dokumi
             else
               if issue[:file_path]
                 file_in_tree = diff.source.file_in_head?(issue[:file_path])
+                file_url = web_url_for_file_in_commit(issue[:file_path], diff.head_commit_id) if file_in_tree
                 if previous_file_path != issue[:file_path]
                   if file_in_tree
-                    file_url = web_url_for_file_in_commit(issue[:file_path], diff.head_commit_id)
                     comment_markdown << "\n[#{issue[:file_path]}](#{file_url}):\n"
                   else
                     comment_markdown << "\n#{issue[:file_path]}:\n"
