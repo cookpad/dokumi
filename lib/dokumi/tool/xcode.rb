@@ -134,6 +134,7 @@ module Dokumi
       IGNORED_COCOAPODS_WARNINGS = [
         "Please close any current Xcode sessions", # .xcworkspace file generated.
         "This is a test version", # Newer version of CocoaPods available.
+        "Unable to load a specification for the plugin", # CocoaPods tries to load plugins that might not be compatible with the version used.
       ]
       def install_pods
         raise "does not use CocoaPods" unless File.exist?("Podfile")
