@@ -105,9 +105,10 @@ module Dokumi
       define_method(option_type) { @options[option_type] }
     end
 
+    LOCAL_CONFIGURATION_FILE_NAME = "dokumi.yml"
     def local_configuration
       return @local_configuration if @local_configuration
-      configuration_path = source_directory.join("dokumi.yml")
+      configuration_path = source_directory.join(LOCAL_CONFIGURATION_FILE_NAME)
       if configuration_path.exist?
         @local_configuration = YAML.load(IO.read(configuration_path))
         @local_configuration = Support.symbolize_keys(@local_configuration)

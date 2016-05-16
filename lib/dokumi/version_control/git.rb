@@ -13,6 +13,20 @@ module Dokumi
             last_commit.oid
           end
 
+          def content_of_file_from_last_commit(file_path)
+            file_path = Support.make_pathname(file_path)
+            raise "Invalid file path" unless file_path.relative?
+            tree = self.last_commit.tree
+            object = nil
+            begin
+              object = tree.path(file_path.to_s)
+            rescue Rugged::TreeError
+              return nil
+            end
+            return nil if object[:type] != :blob
+            Rugged::Blob.lookup(local_copy.local_repo, object[:oid]).content
+          end
+
           def file_in_last_commit?(file_path)
             last_commit.tree.include_file?(local_copy.relative_path(file_path))
           end
@@ -61,7 +75,18 @@ module Dokumi
             else
               Support::Shell.run "git", "fetch", head.remote
             end
-            Support::Shell.run "git", "clean", "-fdx", "-e", "Pods/" # don't remove the Pods/ directory to speed up pod install
+
+            not_cleaned = []
+            configuration_content = @head.content_of_file_from_last_commit BuildEnvironment::LOCAL_CONFIGURATION_FILE_NAME
+            if configuration_content != nil
+              configuration = Support.symbolize_keys(YAML.load(configuration_content))
+              if configuration[:not_cleaned]
+                not_cleaned = [ configuration[:not_cleaned] ].flatten
+              end
+            end
+            additional_arguments_for_clean = not_cleaned.map {|pattern| ["-e", pattern] }
+
+            Support::Shell.run "git", "clean", "-ffdx", *additional_arguments_for_clean.flatten
             Support::Shell.run "git", "reset", "--hard"
             if head.ref_type == :branch
               Support::Shell.run "git", "checkout", "-f", "#{head.remote}/#{head.ref}"
