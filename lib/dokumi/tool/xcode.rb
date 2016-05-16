@@ -50,7 +50,7 @@ module Dokumi
           "*.plist"
         )
         Dir.glob(static_analyzer_plist_pattern).each do |plist_path|
-          content = Xcodeproj::PlistHelper.read(plist_path)
+          content = Xcodeproj::Plist.read_from_path(plist_path)
           next unless content["clang_version"] and content["files"] and content["diagnostics"]
           next if content["files"].empty? or content["diagnostics"].empty?
           content["diagnostics"].each do |diagnostic|

@@ -184,13 +184,13 @@ module Dokumi
             file_paths << path if path
           end
           file_paths = file_paths.uniq.map {|relative_path| @xcodeproj_path.dirname.join(relative_path).expand_path }.sort
-          file_paths.map {|path| [ path, Xcodeproj::PlistHelper.read(path) ] }
+          file_paths.map {|path| [ path, Xcodeproj::Plist.read_from_path(path) ] }
         end
 
         def update_all_plists_for_build_setting(build_setting_name)
           all_plists_for_build_setting(build_setting_name).each do |path, plist_content|
             yield plist_content
-            Xcodeproj::PlistHelper.write(plist_content, path)
+            Xcodeproj::Plist.write_to_path(plist_content, path)
           end
         end
 
