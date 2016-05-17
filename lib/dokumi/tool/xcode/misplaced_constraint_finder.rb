@@ -9,7 +9,9 @@ module Dokumi
           diff = local_copy.diff_with_merge_base
           diff.rugged_diff.each_patch do |patch|
             file_path = patch.delta.new_file[:path]
-            next if file_path == nil or patch.delta.binary? or !/\.(storyboard|xib)\z/i.match(file_path)
+            next if file_path == nil or !File.exist?(file_path)
+            next if patch.delta.binary?
+            next unless /\.(storyboard|xib)\z/i.match(file_path)
 
             doc = File.open(file_path) { |f| Nokogiri::XML.parse(f) }
             misplaced_nodes = doc.css("[misplaced='YES']")
