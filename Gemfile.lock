@@ -15,7 +15,7 @@ GEM
     i18n (0.7.0)
     json (1.8.3)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     multipart-post (2.0.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -43,4 +43,4 @@ DEPENDENCIES
   xcodeproj
 
 BUNDLED WITH
-   1.12.3
+   1.12.4
