@@ -203,7 +203,8 @@ module Dokumi
       private
 
       def quit_simulator
-        Support::Shell.quit_osx_application "iOS Simulator"
+        Support::Shell.quit_osx_application "iOS Simulator" # Xcode 6
+        Support::Shell.quit_osx_application "Simulator" # Xcode 7
       end
 
       def xcodebuild(project_path, options)
