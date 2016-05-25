@@ -233,8 +233,6 @@ module Dokumi
         xcodebuild_path = xcode_path.join("Contents", "Developer", "usr", "bin", "xcodebuild")
         raise "cannot find xcodebuild at #{xcodebuild_path}" unless xcodebuild_path.exist?
 
-        actions = [ options[:actions] ].flatten
-
         args = [ xcodebuild_path ]
         case File.extname(project_path)
         when ".xcodeproj"
@@ -249,7 +247,7 @@ module Dokumi
         args << [ "-derivedDataPath", @environment.work_directory ]
         args << [ "-archivePath", options[:archive_path] ] if options[:archive_path]
         args << [ "-destination", options[:destination] ] if options[:destination]
-        args << actions
+        args << options[:actions]
         args.flatten!
 
         first_try = true
@@ -264,8 +262,8 @@ module Dokumi
           error_extractor.flush
 
           if exit_code != 0 and !error_extractor.new_error_found
-            # The simulator is sometimes a bit flaky so retry once if an error occurred while running tests.
-            if exit_code == 65 and first_try and actions.any? {|action| action.to_s.downcase == "test" }
+            # The simulator and XIB/Storyboard builder are sometimes a bit flaky so retry once if an error occurred.
+            if exit_code == 65 and first_try
               Support.logger.warn "An error (#{exit_code}) happened while running running xcodebuild. Retrying once."
               first_try = false
               next
