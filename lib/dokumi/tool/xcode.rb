@@ -72,9 +72,7 @@ module Dokumi
         @environment.action_executed = true
 
         [ options[:destination] ].flatten.each do |destination|
-          Support::Shell.quit_osx_application "iOS Simulator"
           xcodebuild project_path, actions: :test, scheme: options[:scheme], sdk: "iphonesimulator", destination: destination
-          Support::Shell.quit_osx_application "iOS Simulator"
         end
       end
 
@@ -204,6 +202,10 @@ module Dokumi
 
       private
 
+      def quit_simulator
+        Support::Shell.quit_osx_application "iOS Simulator"
+      end
+
       def xcodebuild(project_path, options)
         Support.validate_hash options, requires: [:scheme, :actions, :sdk], can_also_have: [:destination, :archive_path]
 
@@ -231,6 +233,8 @@ module Dokumi
         xcodebuild_path = xcode_path.join("Contents", "Developer", "usr", "bin", "xcodebuild")
         raise "cannot find xcodebuild at #{xcodebuild_path}" unless xcodebuild_path.exist?
 
+        actions = [ options[:actions] ].flatten
+
         args = [ xcodebuild_path ]
         case File.extname(project_path)
         when ".xcodeproj"
@@ -245,20 +249,33 @@ module Dokumi
         args << [ "-derivedDataPath", @environment.work_directory ]
         args << [ "-archivePath", options[:archive_path] ] if options[:archive_path]
         args << [ "-destination", options[:destination] ] if options[:destination]
-        args << options[:actions]
+        args << actions
         args.flatten!
 
-        exit_code = nil
-        error_extractor = ErrorExtractor.new(@environment)
-        Support.logger.info "running #{args.inspect}"
-        exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
-          error_extractor.process_line(output_type, line)
-        end
-        error_extractor.flush
+        first_try = true
+        loop do
+          quit_simulator
+          exit_code = nil
+          error_extractor = ErrorExtractor.new(@environment)
+          Support.logger.info "running #{args.inspect}"
+          exit_code = Support::Shell.popen_each_line(*args, allow_errors: true) do |output_type, line|
+            error_extractor.process_line(output_type, line)
+          end
+          error_extractor.flush
 
-        if exit_code != 0 and !error_extractor.new_error_found
-          raise "unknown error (#{exit_code}) happened while running xcodebuild"
+          if exit_code != 0 and !error_extractor.new_error_found
+            # The simulator is sometimes a bit flaky so retry once if an error occurred while running tests.
+            if exit_code == 65 and first_try and actions.any? {|action| action.to_s.downcase == "test" }
+              Support.logger.warn "An error (#{exit_code}) happened while running running xcodebuild. Retrying once."
+              first_try = false
+              next
+            end
+            raise "unknown error (#{exit_code}) happened while running xcodebuild"
+          end
+          break
         end
+      ensure
+        quit_simulator
       end
 
       def self.read_configuration
