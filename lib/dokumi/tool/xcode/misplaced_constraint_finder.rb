@@ -18,7 +18,7 @@ module Dokumi
             misplaced_nodes.each do |node|
               environment.add_issue(
                 file_path: file_path,
-                line: diff.file_line_to_diff_line(file_path)[node.line],
+                line: node.line,
                 type: :warning,
                 tool: :misplaced_constraint_finder,
                 description: "This constraint is misplaced.",
