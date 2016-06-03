@@ -54,7 +54,7 @@ class TestReviewXcodeProject < Minitest::Test
     assert_equal 1, issues.length
     issue = issues.first
     assert_equal Dokumi::Support.make_pathname("dokumi-test-ios/AppDelegate.m"), issue[:file_path]
-    assert_equal :compiler, issue[:tool]
+    assert_equal :dokumi, issue[:tool]
     assert_equal :error, issue[:type]
     assert_equal 10, issue[:line]
   end
