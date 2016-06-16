@@ -13,6 +13,7 @@ module Dokumi
       end
 
       def findbugs(target_project)
+        return if @environment.options[:pull_request] != nil && @environment.options[:pull_request].body.include?("skip findbugs")
         @environment.action_executed = true
 
         gradle "--stacktrace", "findbugs"
