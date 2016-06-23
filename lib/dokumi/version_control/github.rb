@@ -158,6 +158,10 @@ module Dokumi
           end
         end
 
+        def body
+          @github_pull_request['body']
+        end
+
         def web_url_for_file_in_commit(relative_path, commit_id)
           "#{@github_pull_request.head.repo.html_url}/blob/#{commit_id}/#{relative_path}"
         end
