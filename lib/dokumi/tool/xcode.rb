@@ -68,7 +68,9 @@ module Dokumi
       end
 
       def test(project_path, options)
-        Support.validate_hash options, requires_only: %i(scheme sdk destination)
+        Support.validate_hash options,
+                              only: %i(scheme destination sdk),
+                              requires: %i(scheme destination)
         @environment.action_executed = true
 
         [ options[:destination] ].flatten.each do |destination|
