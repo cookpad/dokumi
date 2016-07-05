@@ -72,15 +72,15 @@ module Dokumi
                               only: %i(scheme destination sdk),
                               requires: %i(scheme destination)
         @environment.action_executed = true
-        params = {
-          actions: :test,
-          scheme: options[:scheme],
-          destination: destination
-        }
-        params[:sdk] = options[:sdk] if options[:sdk]
 
         [ options[:destination] ].flatten.each do |destination|
-          xcodebuild project_path, **params
+          params = {
+            actions: :test,
+            scheme: options[:scheme],
+            destination: destination,
+          }
+          params[:sdk] ||= options[:sdk]
+          xcodebuild project_path, params
         end
       end
 

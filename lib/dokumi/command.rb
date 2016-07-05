@@ -1,11 +1,11 @@
 module Dokumi
   module Command
     def self.archive(host, owner, repo, branch_or_tag_name, environment_options = {})
-      self.build_scheme(:archive, host, owner, repo, branch_or_tag_name, environment_options)
+      self.build_for(:archive, host, owner, repo, branch_or_tag_name, environment_options)
     end
 
     def self.test(host, owner, repo, branch_or_tag_name, environment_options = {})
-      self.build_scheme(:test, host, owner, repo, branch_or_tag_name, environment_options)
+      self.build_for(:test, host, owner, repo, branch_or_tag_name, environment_options)
     end
 
     def self.review(host, owner, repo, pull_request_number, environment_options = {})
@@ -99,7 +99,7 @@ module Dokumi
 
     private
 
-    def self.build_scheme(action, host, owner, repo, branch_or_tag_name, environment_options)
+    def self.build_for(action, host, owner, repo, branch_or_tag_name, environment_options)
       environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: action)
 
       branch_or_tag = parse_branch_or_tag(host, owner, repo, branch_or_tag_name, environment_options)
