@@ -1,25 +1,11 @@
 module Dokumi
   module Command
     def self.archive(host, owner, repo, branch_or_tag_name, environment_options = {})
-      environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: :archive)
-
-      branch_or_tag = parse_branch_or_tag(host, owner, repo, branch_or_tag_name, environment_options)
-      raise "Unknown type #{type.inspect}." unless branch_or_tag
-      local_copy = branch_or_tag.fetch_into(environment_options[:source_directory])
-
-      environment_options[:local_copy] = local_copy
-      BuildEnvironment.build_project(:archive, environment_options)
+      self.build_scheme(:archive, host, owner, repo, branch_or_tag_name, environment_options)
     end
 
     def self.test(host, owner, repo, branch_or_tag_name, environment_options = {})
-      environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: :test)
-
-      branch_or_tag = parse_branch_or_tag(host, owner, repo, branch_or_tag_name, environment_options)
-      raise "Unknown type #{type.inspect}." unless branch_or_tag
-      local_copy = branch_or_tag.fetch_into(environment_options[:source_directory])
-
-      environment_options[:local_copy] = local_copy
-      BuildEnvironment.build_project(:test, environment_options)
+      self.build_scheme(:test, host, owner, repo, branch_or_tag_name, environment_options)
     end
 
     def self.review(host, owner, repo, pull_request_number, environment_options = {})
@@ -112,6 +98,17 @@ module Dokumi
     end
 
     private
+
+    def self.build_scheme(action, host, owner, repo, branch_or_tag_name, environment_options)
+      environment_options = prepare_directories_and_options host, owner, repo, environment_options.merge(action: action)
+
+      branch_or_tag = parse_branch_or_tag(host, owner, repo, branch_or_tag_name, environment_options)
+      raise "Unknown type #{type.inspect}." unless branch_or_tag
+      local_copy = branch_or_tag.fetch_into(environment_options[:source_directory])
+
+      environment_options[:local_copy] = local_copy
+      BuildEnvironment.build_project(action, environment_options)
+    end
 
     def self.extract_environment_options
       environment_options = {}
