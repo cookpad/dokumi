@@ -74,13 +74,11 @@ module Dokumi
         @environment.action_executed = true
 
         [ options[:destination] ].flatten.each do |destination|
-          params = {
-            actions: :test,
-            scheme: options[:scheme],
-            destination: destination,
-          }
-          params[:sdk] ||= options[:sdk]
-          xcodebuild project_path, params
+          xcodebuild project_path,
+                     actions: :test,
+                     sdk: options[:sdk] || "iphonesimulator",
+                     scheme: options[:scheme],
+                     destination: destination
         end
       end
 
