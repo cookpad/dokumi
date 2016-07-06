@@ -68,11 +68,17 @@ module Dokumi
       end
 
       def test(project_path, options)
-        Support.validate_hash options, requires_only: [:scheme, :destination]
+        Support.validate_hash options,
+                              only: %i(scheme destination sdk),
+                              requires: %i(scheme destination)
         @environment.action_executed = true
 
         [ options[:destination] ].flatten.each do |destination|
-          xcodebuild project_path, actions: :test, scheme: options[:scheme], sdk: "iphonesimulator", destination: destination
+          xcodebuild project_path,
+                     actions: :test,
+                     sdk: options[:sdk] || "iphonesimulator",
+                     scheme: options[:scheme],
+                     destination: destination
         end
       end
 
@@ -126,7 +132,6 @@ module Dokumi
             @environment.add_artifacts zip_path
           end
         end
-
       end
 
       IGNORED_COCOAPODS_WARNINGS = [
