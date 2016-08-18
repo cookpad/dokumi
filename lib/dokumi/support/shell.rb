@@ -9,10 +9,15 @@ module Dokumi
         end
       end
 
+      def self.stringify_shell_arguments(args)
+        # We do not want to stringify everything. For example, hashes (used to pass the environment) should stay as is.
+        args.map {|arg| (arg.is_a?(Pathname) or arg.is_a?(Symbol)) ? arg.to_s : arg }
+      end
+
       def self.popen_each_line(*args)
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
-        args = args.map {|arg| arg.to_s }
+        args = stringify_shell_arguments(args)
         Support.logger.debug "reading outputs of #{args.inspect}"
         exit_status = nil
         with_clean_env do
@@ -46,7 +51,7 @@ module Dokumi
       def self.run(*args)
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
-        args = args.map {|arg| arg.is_a?(Pathname) ? arg.to_s : arg }
+        args = stringify_shell_arguments(args)
         Support.logger.debug "running #{args.inspect}"
         with_clean_env do
           system(*args)

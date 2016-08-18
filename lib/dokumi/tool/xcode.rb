@@ -205,16 +205,7 @@ module Dokumi
         MisplacedConstraintFinder.find_issues @environment
       end
 
-      private
-
-      def quit_simulator
-        Support::Shell.quit_osx_application "iOS Simulator" # Xcode 6
-        Support::Shell.quit_osx_application "Simulator" # Xcode 7
-      end
-
-      def xcodebuild(project_path, options)
-        Support.validate_hash options, requires: [:scheme, :actions, :sdk], can_also_have: [:destination, :archive_path]
-
+      def xcode_path
         configuration = self.class.read_configuration
         xcode_version = @xcode_version
         if xcode_version == :default and @environment.local_configuration[:xcode_version]
@@ -236,6 +227,19 @@ module Dokumi
         raise "Xcode version #{xcode_version} is not configured in xcode_versions.yml" unless xcode_path
         xcode_path = Support.make_pathname(xcode_path)
         raise "#{xcode_path} doesn't point to a existing Xcode" unless xcode_path.exist?
+        return xcode_path
+      end
+
+      private
+
+      def quit_simulator
+        Support::Shell.quit_osx_application "iOS Simulator" # Xcode 6
+        Support::Shell.quit_osx_application "Simulator" # Xcode 7
+      end
+
+      def xcodebuild(project_path, options)
+        Support.validate_hash options, requires: [:scheme, :actions, :sdk], can_also_have: [:destination, :archive_path]
+
         xcodebuild_path = xcode_path.join("Contents", "Developer", "usr", "bin", "xcodebuild")
         raise "cannot find xcodebuild at #{xcodebuild_path}" unless xcodebuild_path.exist?
 
