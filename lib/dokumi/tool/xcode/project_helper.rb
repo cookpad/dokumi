@@ -41,26 +41,25 @@ module Dokumi
           @xcodeproj = Xcodeproj::Project.open(@xcodeproj_path)
         end
 
-        # Set the code signing identity in all the build settings in the project to the value given.
-        def code_signing_identity=(value)
+        # Overwrite a build setting in all the targets and schemes.
+        def overwrite_in_all_build_settings(key, value)
           each_build_settings do |build_settings|
             build_settings.keys.each do |setting_name|
-              build_settings.delete(setting_name) if setting_name.start_with?("CODE_SIGN_IDENTITY[sdk=")
+              build_settings.delete(setting_name) if setting_name.start_with?("#{key}[sdk=")
             end
-            build_settings["CODE_SIGN_IDENTITY"] = value
+            build_settings[key] = value
           end
           @xcodeproj.save
         end
 
+        # Set the code signing identity in all the build settings in the project to the value given.
+        def code_signing_identity=(value)
+          overwrite_in_all_build_settings("CODE_SIGN_IDENTITY", value)
+        end
+
         # Set the provisioning profile in all the build settings in the project to the value given.
         def provisioning_profile=(value)
-          each_build_settings do |build_settings|
-            build_settings.keys.each do |setting_name|
-              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE[sdk=")
-            end
-            build_settings["PROVISIONING_PROFILE"] = value
-          end
-          @xcodeproj.save
+          overwrite_in_all_build_settings("PROVISIONING_PROFILE", value)
         end
 
         # Set the provisioning profile of all the targets in the project to the value given.
@@ -70,6 +69,21 @@ module Dokumi
           @xcodeproj.targets.each do |target|
             attributes["TargetAttributes"][target.uuid] ||= {}
             attributes["TargetAttributes"][target.uuid]["DevelopmentTeam"] = value
+          end
+          @xcodeproj.save
+        end
+
+        # Set the provisioning profiles for multiple targets. The key is the target's' bundle identifier.
+        def update_provisioning_profiles(provisioning_profiles)
+          each_build_settings do |build_settings|
+            bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+            build_settings.keys.each do |setting_name|
+              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE[sdk=")
+            end
+            next unless bundle_identifier
+            provisioning_profile = provisioning_profiles[bundle_identifier]
+            next unless provisioning_profile
+            build_settings["PROVISIONING_PROFILE"] = provisioning_profile
           end
           @xcodeproj.save
         end
