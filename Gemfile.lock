@@ -30,7 +30,7 @@ GEM
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    xcodeproj (1.2.0)
+    xcodeproj (1.1.0)
       activesupport (>= 3)
       claide (>= 1.0.0, < 2.0)
       colored (~> 1.2)
@@ -43,7 +43,7 @@ DEPENDENCIES
   nokogiri
   octokit
   rugged
-  xcodeproj
+  xcodeproj (~> 1.1.0)
 
 BUNDLED WITH
    1.12.5
