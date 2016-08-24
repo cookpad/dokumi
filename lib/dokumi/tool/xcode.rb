@@ -112,6 +112,8 @@ module Dokumi
         directory_for_archiving = @environment.work_directory.join("archiving")
         directory_for_archiving.mkpath
         Dir.chdir(directory_for_archiving) do
+          # For some reason, when using some versions of Xcodeproj, Dir.chdir doesn't always change the current directory, so add a failsafe. 
+          raise "Should be in #{directory_for_archiving} not #{Dir.pwd}" if Pathname.pwd.realpath != directory_for_archiving.realpath
           # we are creating symbolic links, but in the zip (ipa) they will be stored as normal directories (and that's what we want)
           FileUtils.ln_s archive_path.join("Products", "Applications"), "Payload"
           ["WatchKitSupport", "SwiftSupport"].each do |support_type|
@@ -154,7 +156,8 @@ module Dokumi
         loop do
           warnings_found = {output: [], error: []}
           warning_not_finished = {output: false, error: false}
-          exit_code = Support::Shell.popen_each_line(*pod_command, "install", allow_errors: true) do |output_type, line|
+          env = {"DEVELOPER_DIR" => xcode_path.to_s}
+          exit_code = Support::Shell.popen_each_line(env, *pod_command, "install", allow_errors: true) do |output_type, line|
             line = line.chomp
             case output_type
             when :output

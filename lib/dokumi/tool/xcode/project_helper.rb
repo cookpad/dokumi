@@ -62,15 +62,28 @@ module Dokumi
           overwrite_in_all_build_settings("PROVISIONING_PROFILE", value)
         end
 
-        # Set the provisioning profile of all the targets in the project to the value given.
-        def development_team=(value)
+        def overwrite_target_attribute(key, value)
           attributes = @xcodeproj.root_object.attributes
           attributes["TargetAttributes"] ||= {}
           @xcodeproj.targets.each do |target|
             attributes["TargetAttributes"][target.uuid] ||= {}
-            attributes["TargetAttributes"][target.uuid]["DevelopmentTeam"] = value
+            if value == nil
+              attributes["TargetAttributes"][target.uuid].delete(key)
+            else
+              attributes["TargetAttributes"][target.uuid][key] = value
+            end
           end
           @xcodeproj.save
+        end
+
+        # Set the provisioning profile of all the targets in the project to the value given.
+        def development_team=(value)
+          overwrite_target_attribute("DevelopmentTeam", value)
+          overwrite_in_all_build_settings("DEVELOPMENT_TEAM", value) # Xcode 8
+        end
+
+        def make_provisioning_automatic
+          overwrite_target_attribute("ProvisioningStyle", "Automatic")
         end
 
         # Set the provisioning profiles for multiple targets. The key is the target's' bundle identifier.
