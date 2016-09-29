@@ -233,6 +233,16 @@ module Dokumi
         return xcode_path
       end
 
+      def xcodebuild_version
+        version = nil
+        Support::Shell.popen_each_line(xcodebuild_path, "-version", allow_errors: true) do |output_type, line|
+          md = /Xcode ([0-9.]+)/.match(line)
+          version = md[1] if md
+        end
+        raise "cannot find the xcodebuild version" if version == nil
+        version.split(".").map(&:to_i)
+      end
+
       private
 
       def quit_simulator
@@ -240,11 +250,14 @@ module Dokumi
         Support::Shell.quit_osx_application "Simulator" # Xcode 7
       end
 
+      def xcodebuild_path
+        path = xcode_path.join("Contents", "Developer", "usr", "bin", "xcodebuild")
+        raise "cannot find xcodebuild at #{xcodebuild_path}" unless path.exist?
+        path
+      end
+
       def xcodebuild(project_path, options)
         Support.validate_hash options, requires: [:scheme, :actions, :sdk], can_also_have: [:destination, :archive_path]
-
-        xcodebuild_path = xcode_path.join("Contents", "Developer", "usr", "bin", "xcodebuild")
-        raise "cannot find xcodebuild at #{xcodebuild_path}" unless xcodebuild_path.exist?
 
         args = [ xcodebuild_path ]
         case File.extname(project_path)
