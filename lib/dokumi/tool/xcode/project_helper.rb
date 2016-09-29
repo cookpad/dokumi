@@ -52,6 +52,17 @@ module Dokumi
           @xcodeproj.save
         end
 
+        # Remove a build setting in all the targets and schemes.
+        def remove_in_all_build_settings(key)
+          each_build_settings do |build_settings|
+            build_settings.keys.each do |setting_name|
+              build_settings.delete(setting_name) if setting_name.start_with?("#{key}[sdk=")
+            end
+            build_settings.delete(key)
+          end
+          @xcodeproj.save
+        end
+
         # Set the code signing identity in all the build settings in the project to the value given.
         def code_signing_identity=(value)
           overwrite_in_all_build_settings("CODE_SIGN_IDENTITY", value)
@@ -80,10 +91,6 @@ module Dokumi
         def development_team=(value)
           overwrite_target_attribute("DevelopmentTeam", value)
           overwrite_in_all_build_settings("DEVELOPMENT_TEAM", value) # Xcode 8
-        end
-
-        def make_provisioning_automatic
-          overwrite_target_attribute("ProvisioningStyle", "Automatic")
         end
 
         # Set the provisioning profiles for multiple targets. The key is the target's' bundle identifier.
