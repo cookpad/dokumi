@@ -112,6 +112,9 @@ module Dokumi
         def update_provisioning_profile_specifiers(provisioning_profile_specifiers)
           each_build_settings do |build_settings|
             bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+            build_settings.keys.each do |setting_name|
+              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE_SPECIFIER[sdk=")
+            end
             next unless bundle_identifier
             provisioning_profile_specifier = provisioning_profile_specifiers[bundle_identifier]
             next unless provisioning_profile_specifier
