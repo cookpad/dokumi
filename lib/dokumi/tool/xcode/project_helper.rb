@@ -93,17 +93,32 @@ module Dokumi
           overwrite_in_all_build_settings("DEVELOPMENT_TEAM", value) # Xcode 8
         end
 
-        # Set the provisioning profiles for multiple targets. The key is the target's' bundle identifier.
+        # Set the provisioning profiles for multiple targets. The key is the target's bundle identifier.
         def update_provisioning_profiles(provisioning_profiles)
           each_build_settings do |build_settings|
             bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
-            build_settings.keys.each do |setting_name|
-              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE[sdk=")
-            end
             next unless bundle_identifier
             provisioning_profile = provisioning_profiles[bundle_identifier]
             next unless provisioning_profile
+            build_settings.keys.each do |setting_name|
+              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE[sdk=")
+            end
             build_settings["PROVISIONING_PROFILE"] = provisioning_profile
+          end
+          @xcodeproj.save
+        end
+
+        # Set the provisioning profile specifiers for multiple targets. The key is the target's bundle identifier.
+        def update_provisioning_profile_specifiers(provisioning_profile_specifiers)
+          each_build_settings do |build_settings|
+            bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+            next unless bundle_identifier
+            provisioning_profile_specifier = provisioning_profile_specifiers[bundle_identifier]
+            next unless provisioning_profile_specifier
+            build_settings.keys.each do |setting_name|
+              build_settings.delete(setting_name) if setting_name.start_with?("PROVISIONING_PROFILE_SPECIFIER[sdk=")
+            end
+            build_settings["PROVISIONING_PROFILE_SPECIFIER"] = provisioning_profile_specifier
           end
           @xcodeproj.save
         end
