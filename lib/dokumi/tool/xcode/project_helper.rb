@@ -93,7 +93,7 @@ module Dokumi
           overwrite_in_all_build_settings("DEVELOPMENT_TEAM", value) # Xcode 8
         end
 
-        # Set the provisioning profiles for multiple targets. The key is the target's' bundle identifier.
+        # Set the provisioning profiles for multiple targets. The key is the target's bundle identifier.
         def update_provisioning_profiles(provisioning_profiles)
           each_build_settings do |build_settings|
             bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
@@ -108,7 +108,7 @@ module Dokumi
           @xcodeproj.save
         end
 
-        # Set the provisioning profile specifiers for multiple targets. The key is the target's' bundle identifier.
+        # Set the provisioning profile specifiers for multiple targets. The key is the target's bundle identifier.
         def update_provisioning_profile_specifiers(provisioning_profile_specifiers)
           each_build_settings do |build_settings|
             bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
