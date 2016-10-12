@@ -108,6 +108,18 @@ module Dokumi
           @xcodeproj.save
         end
 
+        # Set the provisioning profile specifiers for multiple targets. The key is the target's' bundle identifier.
+        def update_provisioning_profile_specifiers(provisioning_profile_specifiers)
+          each_build_settings do |build_settings|
+            bundle_identifier = build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+            next unless bundle_identifier
+            provisioning_profile_specifier = provisioning_profile_specifiers[bundle_identifier]
+            next unless provisioning_profile_specifier
+            build_settings["PROVISIONING_PROFILE_SPECIFIER"] = provisioning_profile_specifier
+          end
+          @xcodeproj.save
+        end
+
         # Update all the values of a specific build setting in the project.
         def update_existing_build_setting_values(setting_name_to_update, &block)
           each_build_settings do |build_settings|
