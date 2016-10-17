@@ -2,10 +2,12 @@ module Dokumi
   module Command
     def self.archive(host, owner, repo, branch_or_tag_name, environment_options = {})
       self.build_for(:archive, host, owner, repo, branch_or_tag_name, environment_options)
+      self.export_benchmark_report(environment_options)
     end
 
     def self.test(host, owner, repo, branch_or_tag_name, environment_options = {})
       self.build_for(:test, host, owner, repo, branch_or_tag_name, environment_options)
+      self.export_benchmark_report(environment_options)
     end
 
     def self.review(host, owner, repo, pull_request_number, environment_options = {})
@@ -22,12 +24,15 @@ module Dokumi
       diff = local_copy.diff_with_merge_base
       issues = diff.filter_out_unrelated_issues(environment.issues, lines_around_related: environment.lines_around_related)
       pull_request.add_comments_for_issues(issues, diff) unless environment_options[:skip_comment_creation]
+      self.export_benchmark_report(environment_options)
 
       issues
     end
 
     def self.review_and_report(host, owner, repo, pull_request_number, environment_options)
       issues = review(host, owner, repo, pull_request_number, environment_options)
+      self.export_benchmark_report(environment_options)
+
 
       if issues.length == 0
         Support.logger.info "great, no issue found"
@@ -134,6 +139,12 @@ module Dokumi
       else
         nil
       end
+    end
+
+    def self.export_benchmark_report(environment_options)
+      filepath = environment_options[:benchmarker_export_path]
+      return unless filepath
+      Support.benchmarker.export!(filepath)
     end
   end
 end
