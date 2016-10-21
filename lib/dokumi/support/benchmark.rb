@@ -4,12 +4,12 @@ require 'json'
 module Dokumi
   module Support
     class ExecutionLog
-      attr_reader :command, :tms, :timestamp
+      attr_reader :command, :tms, :start_time
 
-      def initialize(command, tms, timestamp)
+      def initialize(command, tms, start_time)
         @command = command
         @tms = tms
-        @timestamp = timestamp
+        @start_time = start_time
       end
 
       def to_hash
@@ -20,7 +20,7 @@ module Dokumi
           stime: tms.stime,
           total: tms.total,
           utime: tms.utime,
-          timestamp: timestamp.to_i,
+          start_time: start_time.to_i,
         }
       end
     end
@@ -37,10 +37,11 @@ module Dokumi
         Support.logger.info "#{filename} is exported"
       end
 
-      def measure(command)
-        timestamp = Time.now
-        tms = Benchmark.measure(command) { yield }
-        data << ExecutionLog.new(command, tms, timestamp)
+      def measure(*args, &block)
+        command = args.map {|arg| arg.to_s.shellescape }
+        start_time = Time.now
+        tms = Benchmark.measure(command, &block)
+        data << ExecutionLog.new(command, tms, start_time)
       end
 
       private
@@ -48,8 +49,7 @@ module Dokumi
     end
 
     def self.benchmarker
-      return @benchmarker if @benchmarker
-      @benchmarker = Benchmarker.new
+      @benchmarker ||= Benchmarker.new
     end
   end
 end
