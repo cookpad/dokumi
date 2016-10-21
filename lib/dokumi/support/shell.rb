@@ -21,7 +21,7 @@ module Dokumi
         Support.logger.debug "reading outputs of #{args.inspect}"
         exit_status = nil
         with_clean_env do
-          Support.measure(args.join(' ')) do
+          Support.benchmarker.measure(args.join(' ')) do
             exit_status = Open3.popen3(*args) do |stdin, stdout, stderr, wait_thread|
               stdin.close
               to_read = [stdout, stderr]
@@ -56,7 +56,7 @@ module Dokumi
         args = stringify_shell_arguments(args)
         Support.logger.debug "running #{args.inspect}"
         with_clean_env do
-          Support.measure(args.join(' ')) do
+          Support.benchmarker.measure(args.join(' ')) do
             system(*args)
           end
         end
