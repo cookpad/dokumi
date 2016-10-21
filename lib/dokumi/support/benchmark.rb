@@ -25,7 +25,6 @@ module Dokumi
       end
     end
 
-
     class Benchmarker
       def initialize
         @data = []
@@ -40,9 +39,7 @@ module Dokumi
 
       def measure(command)
         timestamp = Time.now
-        tms = Benchmark.measure(command) do
-          yield
-        end
+        tms = Benchmark.measure(command) { yield }
         data << ExecutionLog.new(command, tms, timestamp)
       end
 
@@ -50,7 +47,6 @@ module Dokumi
       attr_accessor :data
     end
 
-    private
     def self.benchmarker
       return @benchmarker if @benchmarker
       @benchmarker = Benchmarker.new

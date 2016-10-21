@@ -33,7 +33,6 @@ module Dokumi
       issues = review(host, owner, repo, pull_request_number, environment_options)
       self.export_benchmark_report(environment_options)
 
-
       if issues.length == 0
         Support.logger.info "great, no issue found"
         exit true
