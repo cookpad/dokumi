@@ -31,7 +31,6 @@ module Dokumi
 
     def self.review_and_report(host, owner, repo, pull_request_number, environment_options)
       issues = review(host, owner, repo, pull_request_number, environment_options)
-      export_benchmark_report(environment_options)
 
       if issues.length == 0
         Support.logger.info "great, no issue found"

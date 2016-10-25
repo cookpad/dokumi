@@ -31,10 +31,9 @@ module Dokumi
       end
 
       def export!(filename)
-        File.open(filename, 'w') do |file|
-          JSON.dump(data.map(&:to_hash), file)
-        end
-        Support.logger.info "#{filename} is exported"
+        json = JSON.pretty_generate(data.map(&:to_hash))
+        File.write(filename, json)
+        Support.logger.info "#{filename} has been exported"
       end
 
       def measure(*args, &block)
