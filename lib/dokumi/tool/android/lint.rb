@@ -10,8 +10,7 @@ module Dokumi
             File.open(report_path) do |file|
               report = Nokogiri::XML(file)
 
-              report.xpath("//issue").map do |issue|
-                {
+              report.xpath("//issue").map do |issue| {
                     description: issue.attribute("message").to_s,
                     file_path: issue.xpath("location/@file").to_s,
                     line: issue.xpath("location/@line").to_s.to_i,

@@ -13,9 +13,7 @@ class TestFindbugs < Minitest::Test
     issues = Dokumi::Command.review("github.com", "tatsuhama", "DokumiLint", 1, skip_comment_creation: true, build_script: build_script)
     
     assert_equal 2, issues.length
-    issues.each do |issue|
-      assert_equal :lint, issue[:tool]
-    end
+    issues.each { |issue| assert_equal :lint, issue[:tool] }
     # issues[0]
     assert_equal :error, issues[0][:type]
     assert_equal 12, issues[0][:line]
