@@ -117,6 +117,7 @@ Supported analysis tools
 
 - [Findbugs](https://docs.gradle.org/current/dsl/org.gradle.api.plugins.quality.FindBugs.html)
 - [Infer](http://fbinfer.com/)
+- [Lint](https://developer.android.com/studio/write/lint.html)
 
 How to use Dokumi with Jenkins
 ------------------------------
