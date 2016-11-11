@@ -1,4 +1,5 @@
 require_relative "android/findbugs"
+require_relative "android/lint"
 
 module Dokumi
   module Tool
@@ -41,6 +42,21 @@ module Dokumi
               tool: :infer
           )
         end
+      end
+      
+      def lint(target_project)
+          @environment.action_executed = true
+          
+          Support::Shell.run({"ANDROID_HOME" => @configuration[:android_home]}, "./gradlew", "lint")
+          Lint.parse_report(target_project).each do |bug|
+            @environment.add_issue(
+              file_path: bug[:file_path],
+              line: bug[:line],
+              type: bug[:type],
+              description: bug[:description],
+              tool: :lint
+            )
+          end
       end
 
       private
