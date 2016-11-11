@@ -2,7 +2,7 @@ module Dokumi
   module Tool
     class Android
       class Lint
-          LINT_REPORT_FILE = "build/outputs/lint-results-debug.xml"
+          LINT_REPORT_FILE = "build/outputs/lint-results.xml"
         
         class << self
           def parse_report(target_project)
