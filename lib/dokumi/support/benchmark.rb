@@ -31,7 +31,7 @@ module Dokumi
       end
 
       def export!(filename)
-        json = JSON.pretty_generate(data.map(&:to_hash))
+        json = JSON.pretty_generate(@data.map(&:to_hash))
         File.write(filename, json)
         Support.logger.info "#{filename} has been exported"
       end
@@ -40,11 +40,10 @@ module Dokumi
         command = args.map {|arg| arg.to_s.shellescape }
         start_time = Time.now
         tms = Benchmark.measure(command, &block)
-        data << ExecutionLog.new(command, tms, start_time)
+        @data << ExecutionLog.new(command, tms, start_time)
       end
 
-      private
-      attr_accessor :data
+      attr_reader :data
     end
 
     def self.benchmarker
