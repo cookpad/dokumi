@@ -2,11 +2,24 @@ module Dokumi
   module Support
     module Shell
       def self.with_clean_env(&block)
-        if defined?(Bundler)
-          Bundler.with_clean_env(&block)
-        else
-          block.call
+        to_run = lambda do
+          saved_version = ENV["RBENV_VERSION"]
+          begin
+            ENV["RBENV_VERSION"] = nil
+            block.call
+          ensure
+            ENV["RBENV_VERSION"] = saved_version
+          end
         end
+        if defined?(Bundler)
+          Bundler.with_clean_env(&to_run)
+        else
+          to_run.call
+        end
+      end
+
+      def self.using_rbenv?
+        ENV.keys.any? {|key| key.start_with?("RBENV_") }
       end
 
       def self.stringify_shell_arguments(args)
@@ -14,14 +27,39 @@ module Dokumi
         args.map {|arg| (arg.is_a?(Pathname) or arg.is_a?(Symbol)) ? arg.to_s : arg }
       end
 
+      def self.prepare_arguments(args)
+        args = stringify_shell_arguments(args)
+
+        return args unless using_rbenv?
+
+        commands_needing_override = ["bundle", "ruby"]
+        env = nil
+        if args.first.respond_to?(:to_hash)
+          env = args.shift
+        end
+
+        if args.length == 1 and commands_needing_override.include?(args.first.strip.split(/\s+/).first)
+          args = ["rbenv exec #{args.first}"]
+        elsif commands_needing_override.include?(args.first)
+          args = ["rbenv", "exec", *args]
+        end
+
+        if env
+          [env, *args]
+        else
+          args
+        end
+      end
+
       def self.popen_each_line(*args)
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
-        args = stringify_shell_arguments(args)
-        Support.logger.debug "reading outputs of #{args.inspect}"
+        original_args = stringify_shell_arguments(args)
+        args = prepare_arguments(args)
+        Support.logger.debug "reading outputs of #{original_args.inspect}"
         exit_status = nil
-        with_clean_env do
-          Support.benchmarker.measure(*args) do
+        Support.benchmarker.measure(*original_args) do
+          with_clean_env do
             exit_status = Open3.popen3(*args) do |stdin, stdout, stderr, wait_thread|
               stdin.close
               to_read = [stdout, stderr]
@@ -44,19 +82,20 @@ module Dokumi
               wait_thread.value
             end
           end
-          exit_code = exit_status.exitstatus
-          raise "#{args.inspect} exited in error: #{exit_status.inspect}" if exit_code != 0 and !options[:allow_errors]
-          exit_code
         end
+        exit_code = exit_status.exitstatus
+        raise "#{args.inspect} exited in error: #{exit_status.inspect}" if exit_code != 0 and !options[:allow_errors]
+        exit_code
       end
 
       def self.run(*args)
         options = Support.extract_options!(args)
         Support.validate_hash options, only: [:allow_errors, :silent]
-        args = stringify_shell_arguments(args)
-        Support.logger.debug "running #{args.inspect}"
-        with_clean_env do
-          Support.benchmarker.measure(*args) do
+        original_args = stringify_shell_arguments(args)
+        args = prepare_arguments(args)
+        Support.logger.debug "running #{original_args.inspect}"
+        Support.benchmarker.measure(*original_args) do
+          with_clean_env do
             system(*args)
           end
         end
