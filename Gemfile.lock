@@ -1,53 +1,51 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    CFPropertyList (2.3.4)
-    activesupport (4.2.7.1)
+    CFPropertyList (2.3.5)
+    activesupport (5.0.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
-      json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
-      thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
     claide (1.0.1)
     colored (1.2)
-    faraday (0.10.0)
+    concurrent-ruby (1.0.4)
+    faraday (0.11.0)
       multipart-post (>= 1.2, < 3)
-    i18n (0.7.0)
-    json (1.8.3)
+    i18n (0.8.0)
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     multipart-post (2.0.0)
     nanaimo (0.2.3)
-    nokogiri (1.6.8.1)
+    nokogiri (1.7.0.1)
       mini_portile2 (~> 2.1.0)
     octokit (4.6.2)
       sawyer (~> 0.8.0, >= 0.5.3)
-    public_suffix (2.0.4)
-    rugged (0.24.0)
+    public_suffix (2.0.5)
+    rugged (0.25.1.1)
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
       faraday (~> 0.8, < 1.0)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    xcodeproj (1.4.1)
+    xcodeproj (1.4.2)
       CFPropertyList (~> 2.3.3)
       activesupport (>= 3)
       claide (>= 1.0.1, < 2.0)
       colored (~> 1.2)
-      nanaimo (~> 0.2.0)
+      nanaimo (~> 0.2.3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport (>= 4.2, < 5.0)
   nokogiri
   octokit
   rugged
-  xcodeproj (~> 1.4.1)
+  xcodeproj
 
 BUNDLED WITH
-   1.13.6
+   1.14.4
