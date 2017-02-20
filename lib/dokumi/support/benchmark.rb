@@ -37,10 +37,9 @@ module Dokumi
       end
 
       def measure(*args, &block)
-        command = args.map {|arg| arg.to_s.shellescape }
         start_time = Time.now
-        tms = Benchmark.measure(command, &block)
-        @data << ExecutionLog.new(command, tms, start_time)
+        tms = Benchmark.measure(args, &block)
+        @data << ExecutionLog.new(args, tms, start_time)
       end
 
       attr_reader :data
