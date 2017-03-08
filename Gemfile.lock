@@ -9,12 +9,17 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
+    cause (0.1)
     claide (1.0.1)
     colored (1.2)
     concurrent-ruby (1.0.4)
     faraday (0.11.0)
       multipart-post (>= 1.2, < 3)
     i18n (0.8.0)
+    influxdb (0.3.14)
+      cause
+      json
+    json (2.0.3)
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     multipart-post (2.0.0)
@@ -42,6 +47,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  influxdb
   nokogiri
   octokit
   rugged
