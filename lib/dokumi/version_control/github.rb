@@ -92,6 +92,10 @@ module Dokumi
           @github_client.pull_request({owner: @owner, repo: @repo}, @number)
         end
 
+        def labels
+          @labels ||= @github_client.labels_for_issue({owner: @owner, repo: @repo}, @number).map {|label| label.name }
+        end
+
         def initialize(host, owner, repo, number)
           @host, @owner, @repo, @number = host, owner, repo, number
           @github_client = GitHub.make_client(host)
