@@ -90,6 +90,10 @@ module Dokumi
       @action_executed
     end
 
+    def option_enabled?(key)
+      options[key] != nil && ['1', 'true'].include?(options[key].strip.downcase)
+    end
+
     def issues
       @issues.dup.freeze
     end
